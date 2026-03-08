@@ -7,8 +7,8 @@ app.use(cors());
 app.use(express.json());
 
 const SITE_LOCATION = {
-  latitude: 28.630018324289818,
-  longitude: 77.37844554420684,
+  latitude: 28.62995209594908,
+  longitude: 77.37719558188438,
 };
 
 const MAX_RADIUS = 20;
