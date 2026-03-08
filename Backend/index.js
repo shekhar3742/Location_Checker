@@ -7,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 
 const SITE_LOCATION = {
-  latitude: 28.62995209594908,
+  latitude: 28.630027432315067,
   longitude: 77.37719558188438,
 };
 
