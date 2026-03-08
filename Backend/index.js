@@ -9,10 +9,11 @@ app.use(express.json());
 const SITE_LOCATION = {
   latitude: 28.629363361585177,
   longitude: 77.37706978560367,
-}; 
+};
+
 const MAX_RADIUS = 20;
 
-// Haversine formula
+// Haversine Formula
 function getDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000;
 
@@ -22,11 +23,10 @@ function getDistance(lat1, lon1, lat2, lon2) {
   const dLon = toRad(lon2 - lon1);
 
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.sin(dLat / 2) ** 2 +
     Math.cos(toRad(lat1)) *
       Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+      Math.sin(dLon / 2) ** 2;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
@@ -36,6 +36,13 @@ function getDistance(lat1, lon1, lat2, lon2) {
 app.post("/checkin", (req, res) => {
   const { latitude, longitude, accuracy } = req.body;
 
+  if (!latitude || !longitude || !accuracy) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid location data",
+    });
+  }
+
   const distance = getDistance(
     SITE_LOCATION.latitude,
     SITE_LOCATION.longitude,
@@ -43,12 +50,19 @@ app.post("/checkin", (req, res) => {
     longitude
   );
 
-  if (accuracy <= 30 && distance <= MAX_RADIUS + accuracy) {
+  console.log({
+    latitude,
+    longitude,
+    accuracy,
+    distance,
+  });
+
+  if (accuracy <= 30 && distance <= MAX_RADIUS) {
     return res.json({
       success: true,
       message: "✅ Check-in allowed",
       distance,
-      
+      accuracy,
     });
   }
 
@@ -56,9 +70,12 @@ app.post("/checkin", (req, res) => {
     success: false,
     message: "❌ You are outside the 20m range",
     distance,
+    accuracy,
   });
 });
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
