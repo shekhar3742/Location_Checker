@@ -8,7 +8,7 @@ function CheckIn() {
       async (position) => {
         const { latitude, longitude, accuracy } = position.coords;
 
-        const response = await fetch("http://localhost:5000/checkin", {
+        const response = await fetch("https://location-checker-1.onrender.com/checkin", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
