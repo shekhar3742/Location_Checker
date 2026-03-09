@@ -21,16 +21,16 @@ function CheckIn() {
     try {
       setMessage("Getting location...");
 
-      // First reading
+      
       const loc1 = await getLocation();
 
-      // Wait 2 seconds
+      
       await new Promise((r) => setTimeout(r, 2000));
 
-      // Second reading
+      
       const loc2 = await getLocation();
 
-      // Average coordinates
+     
       const latitude = (loc1.latitude + loc2.latitude) / 2;
       const longitude = (loc1.longitude + loc2.longitude) / 2;
       const accuracy = Math.min(loc1.accuracy, loc2.accuracy);
