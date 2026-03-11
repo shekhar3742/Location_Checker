@@ -7,10 +7,10 @@ app.use(cors());
 app.use(express.json());
 
 const SITE_LOCATION = {
-  latitude: 28.601255741535308,
-  longitude: 77.42942248327425,
+  latitude: 28.601244435263194,
+  longitude: 77.42941919674747,
 };
-
+ 
 const MAX_RADIUS = 20;
 
 // Haversine Formula
