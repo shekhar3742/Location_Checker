@@ -36,7 +36,11 @@ function getDistance(lat1, lon1, lat2, lon2) {
 app.post("/checkin", (req, res) => {
   const { latitude, longitude, accuracy } = req.body;
 
-  if (!latitude || !longitude || !accuracy) {
+  if (
+  latitude === undefined ||
+  longitude === undefined ||
+  accuracy === undefined
+) {
     return res.status(400).json({
       success: false,
       message: "Invalid location data",
