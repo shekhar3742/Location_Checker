@@ -3,47 +3,69 @@ import { useState } from "react";
 function CheckIn() {
   const [message, setMessage] = useState("");
 
-  const handleCheckIn = () => {
-    setMessage("Getting location...");
-
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        try {
-          const { latitude, longitude, accuracy } = pos.coords;
-
-          const response = await fetch(
-            "https://location-checker-1.onrender.com/checkin",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                latitude,
-                longitude,
-                accuracy,
-              }),
-            }
-          );
-
-          const data = await response.json();
-
-          setMessage(
-            `${data.message} | Distance: ${data.distance.toFixed(2)} m`
-          );
-        } catch (error) {
-          setMessage("Server error");
+  // function to get GPS location
+  const getLocation = () => {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve(pos.coords),
+        (err) => reject(err),
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 3000,
         }
-      },
-      (error) => {
-        setMessage("Location permission denied");
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 5000,
+      );
+    });
+  };
+
+  const handleCheckIn = async () => {
+    try {
+      setMessage("Getting location...");
+
+      // first reading
+      let location = await getLocation();
+
+      // retry if accuracy is poor
+      if (location.accuracy > 25) {
+        setMessage("Improving location accuracy...");
+        location = await getLocation();
       }
-    );
+
+      const { latitude, longitude, accuracy } = location;
+
+      const response = await fetch(
+        "https://location-checker-1.onrender.com/checkin",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            latitude,
+            longitude,
+            accuracy,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      setMessage(
+        `${data.message} | Distance: ${data.distance.toFixed(
+          2
+        )} m | Accuracy: ${accuracy.toFixed(2)} m`
+      );
+    } catch (error) {
+      if (error.code === 1) {
+        setMessage("❌ Location permission denied");
+      } else if (error.code === 2) {
+        setMessage("❌ Location unavailable");
+      } else if (error.code === 3) {
+        setMessage("❌ Location request timed out. Try again.");
+      } else {
+        setMessage("❌ Error getting location");
+      }
+    }
   };
 
   return (
